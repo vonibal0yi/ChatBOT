@@ -1,0 +1,48 @@
+:root{
+  --bg: #0b0f12;
+  --panel: #0f1720;
+  --accent: #e11d48;
+  --accent-2: #111827;
+  --text: #f8fafc;
+  --muted: #9ca3af;
+}
+
+:root[data-theme='light']{
+  --bg: #f7f7f9;
+  --panel: #ffffff;
+  --accent: #b91c1c;
+  --text: #0b1220;
+  --muted: #4b5563;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+body{background:linear-gradient(180deg,var(--bg) 0%, #071018 100%);color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px}
+
+.chat-app{width:100%;max-width:920px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;overflow:hidden}
+
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.chat-header h1{font-size:18px;margin:0}
+.chat-header .controls button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 10px;border-radius:8px;color:var(--text);cursor:pointer}
+
+.chat-main{height:520px;padding:18px 20px;overflow:auto;position:relative}
+.messages{display:flex;flex-direction:column;gap:14px}
+
+.message{max-width:78%;display:flex;flex-direction:column}
+.message .meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+.message .bubble{padding:12px 14px;border-radius:12px;line-height:1.35;white-space:pre-wrap}
+
+.message.received{align-self:flex-start}
+.message.received .bubble{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.02)}
+
+.message.sent{align-self:flex-end;text-align:right}
+.message.sent .bubble{background:linear-gradient(90deg,var(--accent),#f97316);color:white}
+
+.chat-form{display:flex;gap:10px;padding:14px;border-top:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(0,0,0,0.02),transparent)}
+.chat-input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);outline:none}
+.chat-send{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+
+.chat-footer{padding:10px 14px;border-top:1px solid rgba(255,255,255,0.02);text-align:center;color:var(--muted);font-size:12px}
+
+.typing{position:absolute;bottom:10px;left:20px;font-size:13px;color:var(--muted);opacity:0.95}
+.hidden{display:none}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chat Board — Business Finance Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="chat-app">
+    <header class="chat-header">
+      <h1>Finance Manager — Business Assistant</h1>
+      <div class="controls">
+        <button id="theme-toggle" aria-label="Toggle theme">Light</button>
+      </div>
+    </header>
+
+    <main class="chat-main" id="chat-main" role="log" aria-live="polite">
+      <div class="messages" id="messages"></div>
+      <div id="typing-indicator" class="typing hidden">Finance assistant is typing...</div>
+    </main>
+
+    <form class="chat-form" id="chat-form" action="#">
+      <input id="input" class="chat-input" type="text" placeholder="Ask about budgets, expenses, invoices..." autocomplete="off" />
+      <button id="send" class="chat-send" type="submit">Send</button>
+    </form>
+
+    <footer class="chat-footer">
+      <small>Replies are generated locally (no external APIs). Messages are saved in your browser.</small>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
