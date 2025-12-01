@@ -1,35 +1,450 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chat Board — Business Finance Assistant</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <title>Personal Finance Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Track expenses and income with a simple, modern dashboard." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <div class="chat-app">
-    <header class="chat-header">
-      <h1>Finance Manager — Business Assistant</h1>
-      <div class="controls">
-        <button id="theme-toggle" aria-label="Toggle theme">Light</button>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">My Finance</span>
+      </div>
+
+      <nav class="app-nav" aria-label="Main">
+        <button class="nav-link active" data-view="home">Home</button>
+        <button class="nav-link" data-view="expenses">Expenses</button>
+        <button class="nav-link" data-view="income">Income</button>
+        <button class="nav-link" data-view="settings">Settings</button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">
+          <span class="icon-sun">☀</span>
+          <span class="icon-moon">🌙</span>
+        </button>
       </div>
     </header>
 
-    <main class="chat-main" id="chat-main" role="log" aria-live="polite">
-      <div class="messages" id="messages"></div>
-      <div id="typing-indicator" class="typing hidden">Finance assistant is typing...</div>
+    <main class="app-main">
+      <!-- HOME / DASHBOARD -->
+      <section id="view-home" class="view active" aria-labelledby="home-title">
+        <header class="view-header">
+          <h1 id="home-title">Dashboard</h1>
+          <p class="view-subtitle">
+            A simple overview of your money. No jargon. Just what matters.
+          </p>
+        </header>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>This month</h2>
+            <p class="section-help" data-hint>
+              See how much is coming in, going out, and what’s left.
+            </p>
+          </header>
+
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <h3>Income</h3>
+              <p class="kpi-value" id="kpi-income">0</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Expenses</h3>
+              <p class="kpi-value kpi-expense" id="kpi-expenses">0</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Net</h3>
+              <p class="kpi-value" id="kpi-net">0</p>
+              <p class="kpi-foot" data-hint>Income − Expenses</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Run rate</h3>
+              <p class="kpi-value" id="kpi-run-rate">0 / day</p>
+              <p class="kpi-foot" data-hint>Average spending per day this month.</p>
+            </article>
+            <article class="kpi-card">
+              <h3>Projected month end</h3>
+              <p class="kpi-value" id="kpi-projected">0</p>
+              <p class="kpi-foot" data-hint>Estimated total expenses by month end.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Charts</h2>
+          </header>
+          <div class="chart-grid">
+            <div class="chart-card">
+              <h3>Income vs Expenses (12 months)</h3>
+              <canvas id="chart-trend" aria-label="Income vs expenses over the last 12 months"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Expenses by category</h3>
+              <canvas id="chart-expense-pie"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>Income by category</h3>
+              <canvas id="chart-income-pie"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Highlights</h2>
+          </header>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Top 3 expense categories</h3>
+              <ul id="top-expense-cats" class="simple-list"></ul>
+              <p class="empty-text" id="top-expense-empty">Add your first expense to see details here.</p>
+            </article>
+            <article class="card">
+              <h3>Upcoming recurring items (30 days)</h3>
+              <ul id="upcoming-recurring" class="simple-list"></ul>
+              <p class="empty-text" id="upcoming-recurring-empty">No recurring items yet.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section section-actions">
+          <header class="section-header">
+            <h2>Quick actions</h2>
+          </header>
+          <div class="action-row">
+            <button class="btn primary" id="btn-add-expense-home">Add expense</button>
+            <button class="btn outline" id="btn-add-income-home">Add income</button>
+            <button class="btn ghost" id="btn-sample-data">Load sample data</button>
+            <button class="btn ghost" id="btn-export-data-home">Export data</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- EXPENSES -->
+      <section id="view-expenses" class="view" aria-labelledby="expenses-title">
+        <header class="view-header">
+          <h1 id="expenses-title">Expenses</h1>
+          <p class="view-subtitle">
+            Track where your money goes. Small leaks sink big ships.
+          </p>
+        </header>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Add / edit expense</h2>
+          </header>
+          <form id="form-expense" class="form-grid" autocomplete="off">
+            <input type="hidden" id="expense-id" />
+            <div class="field">
+              <label for="expense-amount">Amount</label>
+              <input type="number" id="expense-amount" required min="0" step="0.01" />
+            </div>
+            <div class="field">
+              <label for="expense-date">Date</label>
+              <input type="date" id="expense-date" required />
+            </div>
+            <div class="field">
+              <label for="expense-category">Category</label>
+              <select id="expense-category"></select>
+              <button type="button" class="inline-link" id="btn-new-expense-cat">+ New category</button>
+            </div>
+            <div class="field">
+              <label for="expense-account">Account</label>
+              <input type="text" id="expense-account" placeholder="Cash, Card, Bank…" />
+            </div>
+            <div class="field full">
+              <label for="expense-notes">Notes</label>
+              <input type="text" id="expense-notes" placeholder="Optional" />
+            </div>
+            <div class="field inline">
+              <label>
+                <input type="checkbox" id="expense-recurring" />
+                Recurring
+              </label>
+              <select id="expense-frequency">
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button class="btn primary" type="submit">Save expense</button>
+              <button class="btn ghost" type="reset" id="btn-expense-reset">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Expense list</h2>
+          </header>
+
+          <div class="filters-row">
+            <div class="field">
+              <label for="exp-filter-from">From</label>
+              <input type="date" id="exp-filter-from">
+            </div>
+            <div class="field">
+              <label for="exp-filter-to">To</label>
+              <input type="date" id="exp-filter-to">
+            </div>
+            <div class="field">
+              <label for="exp-filter-cat">Category</label>
+              <select id="exp-filter-cat">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="exp-filter-search">Search notes</label>
+              <input type="text" id="exp-filter-search" placeholder="e.g. groceries, Uber…" />
+            </div>
+          </div>
+
+          <div class="stats-strip">
+            <div><span>Total:</span> <span id="exp-stat-total">0</span></div>
+            <div><span>Average / day:</span> <span id="exp-stat-avg">0</span></div>
+            <div><span>Biggest expense:</span> <span id="exp-stat-max">0</span></div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table" aria-label="Expenses table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="exp-select-all" /></th>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Account</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Recurring</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="exp-table-body"></tbody>
+            </table>
+          </div>
+
+          <div class="table-actions">
+            <button class="btn outline danger" id="btn-exp-delete-selected">Delete selected</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- INCOME -->
+      <section id="view-income" class="view" aria-labelledby="income-title">
+        <header class="view-header">
+          <h1 id="income-title">Income</h1>
+          <p class="view-subtitle">
+            Track what’s coming in so you can plan with confidence.
+          </p>
+        </header>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Add / edit income</h2>
+          </header>
+          <form id="form-income" class="form-grid" autocomplete="off">
+            <input type="hidden" id="income-id" />
+            <div class="field">
+              <label for="income-amount">Amount</label>
+              <input type="number" id="income-amount" required min="0" step="0.01" />
+            </div>
+            <div class="field">
+              <label for="income-date">Date</label>
+              <input type="date" id="income-date" required />
+            </div>
+            <div class="field">
+              <label for="income-category">Category</label>
+              <select id="income-category"></select>
+              <button type="button" class="inline-link" id="btn-new-income-cat">+ New category</button>
+            </div>
+            <div class="field">
+              <label for="income-account">Account</label>
+              <input type="text" id="income-account" placeholder="Bank, PayPal…" />
+            </div>
+            <div class="field full">
+              <label for="income-notes">Notes</label>
+              <input type="text" id="income-notes" placeholder="Optional" />
+            </div>
+            <div class="field inline">
+              <label>
+                <input type="checkbox" id="income-recurring" />
+                Recurring
+              </label>
+              <select id="income-frequency">
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button class="btn primary" type="submit">Save income</button>
+              <button class="btn ghost" type="reset" id="btn-income-reset">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Income list</h2>
+          </header>
+
+          <div class="filters-row">
+            <div class="field">
+              <label for="inc-filter-from">From</label>
+              <input type="date" id="inc-filter-from">
+            </div>
+            <div class="field">
+              <label for="inc-filter-to">To</label>
+              <input type="date" id="inc-filter-to">
+            </div>
+            <div class="field">
+              <label for="inc-filter-cat">Category</label>
+              <select id="inc-filter-cat">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="inc-filter-search">Search notes</label>
+              <input type="text" id="inc-filter-search" placeholder="e.g. salary, freelance…" />
+            </div>
+          </div>
+
+          <div class="stats-strip">
+            <div><span>Total:</span> <span id="inc-stat-total">0</span></div>
+            <div><span>Average / day:</span> <span id="inc-stat-avg">0</span></div>
+            <div><span>Largest income:</span> <span id="inc-stat-max">0</span></div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table" aria-label="Income table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="inc-select-all" /></th>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Account</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Recurring</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="inc-table-body"></tbody>
+            </table>
+          </div>
+
+          <div class="table-actions">
+            <button class="btn outline danger" id="btn-inc-delete-selected">Delete selected</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" class="view" aria-labelledby="settings-title">
+        <header class="view-header">
+          <h1 id="settings-title">Settings</h1>
+          <p class="view-subtitle">
+            Make the app feel like yours. No finance degree required.
+          </p>
+        </header>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>General</h2>
+          </header>
+          <div class="settings-grid">
+            <div class="card">
+              <h3>Currency</h3>
+              <p class="section-help" data-hint>
+                This only changes how amounts are displayed, not the math.
+              </p>
+              <select id="setting-currency">
+                <option value="ZAR">ZAR (R)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
+
+            <div class="card">
+              <h3>Beginner hints</h3>
+              <label class="toggle">
+                <input type="checkbox" id="setting-hints" checked />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span>Show helper text & explanations</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Categories</h2>
+          </header>
+          <div class="settings-grid">
+            <div class="card">
+              <h3>Expense categories</h3>
+              <ul id="setting-expense-cats" class="pill-list"></ul>
+              <div class="inline-add">
+                <input type="text" id="setting-expense-new" placeholder="New expense category" />
+                <button class="btn small" id="btn-setting-expense-add">Add</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Income categories</h3>
+              <ul id="setting-income-cats" class="pill-list"></ul>
+              <div class="inline-add">
+                <input type="text" id="setting-income-new" placeholder="New income category" />
+                <button class="btn small" id="btn-setting-income-add">Add</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <header class="section-header">
+            <h2>Data & backup</h2>
+          </header>
+          <div class="settings-grid">
+            <div class="card">
+              <h3>Export data</h3>
+              <p class="section-help">Download everything as a JSON file.</p>
+              <button class="btn outline" id="btn-export-data-settings">Export JSON</button>
+            </div>
+            <div class="card">
+              <h3>Import data</h3>
+              <p class="section-help">Load data exported from this app.</p>
+              <input type="file" id="input-import-json" accept="application/json" />
+            </div>
+            <div class="card danger-card">
+              <h3>Reset app</h3>
+              <p class="section-help">Delete all data and start fresh.</p>
+              <button class="btn outline danger" id="btn-reset-app">Reset everything</button>
+            </div>
+          </div>
+        </section>
+      </section>
     </main>
 
-    <form class="chat-form" id="chat-form" action="#">
-      <input id="input" class="chat-input" type="text" placeholder="Ask about budgets, expenses, invoices..." autocomplete="off" />
-      <button id="send" class="chat-send" type="submit">Send</button>
-    </form>
-
-    <footer class="chat-footer">
-      <small>Replies are generated locally (no external APIs). Messages are saved in your browser.</small>
+    <footer class="app-footer">
+      <small>Personal Finance Manager · <span id="footer-year"></span></small>
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
